@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="ja" class="vh-100 vw-100 p-0 m-0">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" charset="utf-8" src="https://yamacraft.github.io/textar-font/webfont.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-analytics.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.js" integrity="sha512-bvQAGUdz84PpeKWrShm1eEp20Fkcv7PJespsVWVtkTB74C8rNmg75Hru8w1AXnfiNHXnT/XF2jqZskyU3bIaMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js" integrity="sha512-nOQuvD9nKirvxDdvQ9OMqe2dgapbPB7vYAMrzJihw5m+aNcf0dX53m6YxM4LgA9u8e9eg9QX+/+mPu8kCNpV2A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lity/2.4.1/lity.min.js" integrity="sha512-UU0D/t+4/SgJpOeBYkY+lG16MaNF8aqmermRIz8dlmQhOlBnw6iQrnt4Ijty513WB3w+q4JO75IX03lDj6qQNA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <title>あやしげNEO</title>
+    <style>
+        .my a{
+            color:azure;
+        }
+        .chat a{
+            color:blue;
+        }
+        h2{
+            display: inline-block;
+        }
+        li{
+            list-style-type: none;
+            width: 100%;
+        }
+
+        .chat{
+            border-radius: 2px 15px 15px 15px;
+            background-color:whitesmoke;
+            border-style: solid;
+            border-color:lightgrey;
+            padding: 10px;
+            display: inline-block;
+            white-space:pre-line;
+        }
+
+
+        .chatlist{
+            margin-top: 10px;
+        }
+
+        .my{
+            border-radius:  15px 2px 15px 15px ;
+            background-color:blue;
+            color: aliceblue;
+            border-style: solid;
+            border-color:lightskyblue;
+            padding: 10px;
+            display: inline-block;
+            justify-content: flex-end;
+            white-space: pre-line;
+        }
+
+        .announce{
+            display: inline-block;
+            font-size:small;
+            background-color:darkgray;
+            color:whitesmoke;
+            border-radius: 10px;
+            padding:3px;
+        }
+    </style>
+</head>
+<body class=" w-100 vh-100 ">
+        <div class="row vh-100 vw-100 m-0 p-0 d-flex">
+            <div class="col-3 card mt-0 m-0 p-0 vh-100 d-none d-md-flex">
+                <div class="card p-3 m-0">
+                    <p class="h3">あやしげneo(beta)</p>
+                </div>
+                <div class="overflow-auto h-100 p-0 m-0 d-inline-block w-100">
+                    <div class="card m-0 p-3">
+                        <a class="h4 p-0" href="index.html">ホーム</a>
+                        <p class="m-0 p-0">スレ作成等</p>
+                    </div>
+                    <ul class="thList list-group ">
+                    </ul>
+                </div>
+            </div>
+            <div class="col pt-0 p-0 h-100 d-flex">
+                <div class="col card h-100">
+                    <div class="card d-inline-block p-1">
+                        <div id="titlezone" class=" d-inline-block"></div>
+                        <a href="javascript:$('#threadList').modal('show');" class="btn btn-primary m-1">スレメニュー</a>
+                    </div>
+                    <div id="scroller" class="overflow-auto h-100 p-0 m-0 bg-light textar-aa">
+                        <ul id="list" class="p-0 m-0">
+                        </ul>
+                    </div>
+                    <div class="card p-3 m-0">
+                        <form action="javascript:send();">
+                            <textarea class="form-control mt-3" type="text" maxlength="1000" id="contIn"rows="2" placeholder="コメント 1000文字まで" required></textarea>
+                            <button type="submit" class="btn btn-primary mt-3" id="send">投稿</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <div class="modal modal-dialog-scrollable fade modal-fullscreen-sm-down " id="threadList" tabindex="-1" aria-labelledby="removeLabel" aria-hidden="true" >
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+                <p class="h4">スレッドメニュー</p>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div class="card m-0 p-3">
+                    <a class="h4 p-0" href="index.html">ホーム</a>
+                    <p class="m-0 p-0">スレ作成等</p>
+                </div>
+                <ul class="thList list-group"></ul>
+            </div>
+            <div class="modal-footer">
+                <div id="removeButton"></div>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+            </div>
+          </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="remove" tabindex="-1" aria-labelledby="removeLabel" aria-hidden="true" >
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                本当に削除しますか？
+            </div>
+            <div  class="modal-footer">
+                <div id="removeButton"></div>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal fade" id="authError" tabindex="-1" aria-labelledby="authErrorLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                認証エラーだよ
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" onclick="location.href='index.html'" >Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+
+</body>
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyAH_Oa-OLx_IYo63uVgFEgh2ewneRKSZpo",
+        authDomain: "ayasigebbs.firebaseapp.com",
+        databaseURL: "https://ayasigebbs-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "ayasigebbs",
+        storageBucket: "ayasigebbs.appspot.com",
+        messagingSenderId: "103380597458",
+        appId: "1:103380597458:web:ee336c6a6355eea6800b0b",
+        measurementId: "G-M6S78Y9CPV"
+    };
+
+    var contIn = $('#contIn');
+    var list = $('#list');
+    var thList = $('.thList');
+    var titlezone = $('#titlezone');
+
+    //urlパラメータを取得
+    var url = new URL(window.location.href);
+    var params = url.searchParams;
+    var thID = params.get('t');
+    var name = params.get('n');
+    var pass = params.get('p');
+
+
+    firebase.initializeApp(firebaseConfig);
+    var db = firebase.database();
+    var threadref = db.ref('bbs/threads/' + thID);
+    var contref = db.ref('bbs/conts/' + thID);
+
+    var users = db.ref('bbs/users');
+    var threads = db.ref('bbs/threads');
+    var userlist = [];
+    users.on("child_added", (snapshot)=> {
+        userlist.push(snapshot.val().name)
+    });
+
+    threads.orderByChild('score').on('child_added', (snapshot) => {
+        var data = snapshot.val();
+        var title = data.title;
+        var name = data.name;
+        var ID = snapshot.key;
+        var time = data.time;
+        console.log(data);
+        thList.prepend('<li class="list-group-item"><a href="javascript:move('+ ID +')" class="h4">' + title + '</a><br>' + name + ' | ' + time +'</li>');
+    });
+
+    function move(ID){
+        var name = params.get('n')||"以下、あやしげからもっちがお送りします"
+        if(params.get('n')){
+            var contref = db.ref('bbs/conts/' + ID)
+            var threadref = db.ref('bbs/threads/' + ID);
+            var count ;
+            var score = nowscore+1
+
+            //パスワードが入力されてた場合
+            if(params.get('p')){
+                console.log("入力されてる")
+                var name = params.get('n');
+                var user = db.ref('bbs/users/' + name);
+
+                //登録済み垢だった場合
+                if(userlist.indexOf(name) !== -1){
+                    console.log("登録済み")
+                    user.once('value', (snapshot) => {
+                        var data = snapshot.val();
+                        var dbPass = data.pass;
+                        var dec = CryptoJS.AES.decrypt(dbPass, "qawsedrftgyhujikolp");
+                        var dbPass = dec.toString(CryptoJS.enc.Utf8);
+                        console.log(dbPass);
+                        //パスワードがあってた場合
+                        if(dbPass == pass){
+                            contref.once('value', (snapshot) => {
+                                count = snapshot.numChildren();
+                                var num = count+1;
+                                contref = db.ref('bbs/conts/' + ID + '/' + num);
+                                var time = new Date().toLocaleString();
+                                contref.set({
+                                    name:name,
+                                    type:"enter",
+                                    num:num,
+                                    time:time
+                                });
+                            window.location.href = 'thread.html?t=' + ID + '&n=' + name + '&p=' + pass;
+                            });
+                        }else{
+                            $('#authError').modal('show')
+                            console.log(pass);
+                            console.log(dbPass);
+                        }
+                    });
+                }else{
+                    $('#authError').modal('show');
+                }
+            }else{
+                if(userlist.indexOf(name) === -1){
+                    contref.once('value', (snapshot) => {
+                        count = snapshot.numChildren();
+                        var num = count+1;
+                        contref = db.ref('bbs/conts/' + ID + '/' + num)
+                        var time = new Date().toLocaleString();
+                        contref.set({
+                            name:name,
+                            type:"enter",
+                            num:num,
+                            time:time
+                        });
+                        window.location.href = 'thread.html?t=' + ID + '&n=' + name;
+                    });
+                }else{
+                    $('#usedName').modal('show');
+                }
+            }
+        }else{
+            window.location.href = 'thread.html?t=' + ID;
+        }
+    }
+
+    //レス削除
+    function remove(num){
+        var contref = db.ref('bbs/conts/' + thID + '/' + num);
+        if(params.get('n')){
+            if(params.get('p')){
+                var user = db.ref('bbs/users/' + name);
+                if(userlist.indexOf(name) !== -1){
+                    user.once('value', (snapshot) => {
+                        var data = snapshot.val();
+                        var dbPass = data.pass;
+                        var dec = CryptoJS.AES.decrypt(dbPass, "qawsedrftgyhujikolp");
+                        var dbPass = dec.toString(CryptoJS.enc.Utf8);
+                        if(dbPass == pass){
+                            contref.update({
+                                type:"removed"
+                            })
+                            location.reload();
+                        }else{
+                            $('#authError').modal('show');
+                        }
+                    })
+                }else{
+                    $('#authError').modal('show');
+                }
+            }else{
+                $('#authError').modal('show');
+            }
+        }else{
+            $('#authError').modal('show');
+        }
+    }
+
+    //ボタンが押されたときの処理
+    function send(){
+        var name = params.get('n')||"以下、あやしげからもっちがお送りします"
+        var cont = contIn.val();
+        cont = cont.replace(/(<([^>]+)>)/i, '');
+        var ID = thID;
+        var num = count+1;
+        var contref = db.ref('bbs/conts/' + thID + '/' + num);
+        var time = new Date().toLocaleString();
+        var score = nowscore + 1;
+
+        if(params.get('n')){
+            if(userlist.indexOf(name) !== -1){
+                console.log("のってる")
+                var pass = params.get('p');
+                var user = db.ref('bbs/users/' + name);
+                user.once('value', (snapshot) => {
+                    var data = snapshot.val();
+                    var dbPass = data.pass;
+                    dbPass = CryptoJS.AES.decrypt(dbPass, "qawsedrftgyhujikolp").toString(CryptoJS.enc.Utf8);
+                    if(dbPass == pass){
+                        console.log("あってるよ")
+                        comment(ID,name,cont,num,time)
+                        threadref.update({
+                score:score
+            });
+                    }else{
+                        console.log("間違っとる")
+                        $('#authError').modal('show');
+                    }
+                })
+            }else{
+                comment(ID,name,cont,num,time)
+                threadref.update({
+                score:score
+            });
+            }
+        }else{
+            comment(ID,name,cont,num,time)
+            threadref.update({
+                score:score
+            });
+        }
+    }
+
+    contref.on("child_added", (snapshot)=> {
+        var data = snapshot.val();
+        var type = data.type;
+        var dbName = data.name;
+        var ID = snapshot.key;
+        list.append(commit(snapshot));
+
+        $('#scroller').scrollTop($('#list').height());
+    });
+
+    var nowscore;
+    var count = 0;
+    threadref.on('value', (snapshot)=> {
+        var data = snapshot.val();
+        var ID = snapshot.key;
+        var name = data.name;
+        var title = data.title;
+        var time = data.time;
+        nowscore = data.score;
+        console.log(nowscore)
+        titlezone.html('<p class="h4 m-0 p-0 d-inline-block">' + title + '</p><p class="p-0 m-0 d-inline-block"> | ' + name + ' | ' + time +'</p>');
+    });
+
+    function commit(snapshot,t){
+        if(t){
+            console.log(t)
+        }
+        console.log(data)
+        var num = snapshot.key;
+        var contref = db.ref('bbs/conts/' + thID + '/' + num);
+        var re = 'error';
+        var data = snapshot.val();
+        var type = data.type;
+        var dbName = data.name;
+        var ID = snapshot.key;
+        if(type == "comment"){
+            if(dbName == name&& t==undefined){
+                console.log(dbName + name)
+                var cont = data.cont;
+                var res = resset(cont);
+
+                cont = urlre(cont);
+                var num = data.num;
+                var time = data.time;
+                if(t){
+                    if(res){
+                        re = num + ' | '  + dbName + ' | ' + time + '<br><div class="my"><div class="card d-inline-block p-2 text-dark " style="text-align: left;">'+ anc(res)+ '<br></div><br>' + cont + '<br><a href="javascript:remove('+ num +')" class="btn btn-primary btn-sm">レスを削除</a></div>'
+                    }else{
+                        re = num + ' | '  + dbName + ' | ' + time + '<br><div class="my"><br>' + cont + '<br><a href="javascript:remove('+ num +')" class="btn btn-primary btn-sm">レスを削除</a></div>'
+                    }
+                }else{
+                    if(res){
+                        re = '<li class="chatlist" style="text-align: right;">'+ num + ' | '  + dbName + ' | ' + time + '<br><div class="my"><div class="card d-inline-block p-2 text-dark" style="text-align: left;">'+ anc(res)+ '</div>' + cont + '<br><a href="javascript:remove('+ num +')" class="btn btn-primary btn-sm">レスを削除</a></div></li>'
+                    }else{
+                        re = '<li class="chatlist" style="text-align: right;">'+ num + ' | '  + dbName + ' | ' + time + '<br><div class="my">' + cont + '<br><a href="javascript:remove('+ num +')" class="btn btn-primary btn-sm">レスを削除</a></div></li>'
+                    }
+                }
+            }else{
+                console.log(dbName + name)
+                var cont = data.cont;
+                var res = resset(cont);
+                cont = cont.replace(/(>>[1-9]\d*|0)/g,"<a class='anc'>" + "$1" + "</a>");
+                cont = urlre(cont);
+                var num = data.num;
+                var time = data.time;
+                if(t){
+                if(res){
+                    re = num + " | " + dbName + " | " + time + '<br><div class="chat"><div class="card d-inline-block p-2">'+ anc(res)+ '</div><br>' + cont + '</div>';
+                }else{
+                    re = num + " | " + dbName + " | " + time + '<br><div class="chat">' + cont + '</div>';
+                }
+                }else{
+                    if(res){
+                    re = '<li class="chatlist">'+ num + " | " + dbName + " | " + time + '<br><div class="chat"><div class="card d-inline-block p-2"">'+ anc(res)+ '</div><br>' + cont + '</div></li>';
+                }else{
+                    re = '<li class="chatlist">'+ num + " | " + dbName + " | " + time + '<br><div class="chat">' + cont + '</div></li>';
+                }
+                }
+            }
+        }else if(type == "removed"){
+            var num = data.num;
+            var time = data.time;
+            if(t){
+                re = '<div class="announce">'+ num + ' | ' +'このレスは削除されました</div>';
+            }else{
+                re = '<li class="text-center" class="chatlist"><div class="announce">'+ num + ' | ' +'このレスは削除されました</div></li>';
+            }
+        }else if(type == "enter"){
+            var dbName = data.name;
+            var num = data.num;
+            var time = data.time;
+            if(t){
+                re = '<div class="announce">'+ num + ' | ' + dbName + 'さんが入室しました | ' + time + '</div>';
+            }else{
+                re = '<li class="text-center"><div class="announce">'+ num + ' | ' + dbName + 'さんが入室しました | ' + time + '</div></li>';
+            }
+        }
+        if(t){}else{
+                    if(num){
+            count = num;
+        }
+        }
+        return re
+    }
+
+    function urlre(cont){
+        cont = cont.replace(/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig, "<a href='$1' class='thumb'>$1</a>");
+        return cont
+    }
+
+    function resset(cont){
+        var res
+        if(cont.match(/>>[1-9]\d*|0/i)){
+            res = cont.match(/>>[1-9]\d*|0/gi)[0].replace(/>>/, "");
+        }
+        console.log(res)
+        return res
+    }
+
+    function rem(num){
+        $('#removeButton').html('<button type="button" class="btn btn-primary" Onclick="remove(' + num + ');">OK</button>')
+        $("#remove").modal("show");
+    }
+
+    function anc(num){
+        var cont;
+        var ancref = db.ref('bbs/conts/' + thID + '/' + num);
+        ancref.once('value',(snapshot)=>{  
+            cont = commit(snapshot,"t");
+        });
+        console.log(cont)
+        return cont;
+    }
+
+    function comment(ID,name,cont,num,time) {
+        var score = nowscore+1
+        var contref = db.ref('bbs/conts/' + thID + '/' + num);
+            contIn.val('');
+            contref.set({
+                ID:ID,
+                name:name,
+                cont:cont,
+                num:num,
+                type:"comment",
+                time:time
+            });
+    }
+
+</script>
+</html>
