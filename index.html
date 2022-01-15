@@ -325,7 +325,9 @@
                         }
                     });
                 }else{
-
+                    var enc = CryptoJS.AES.encrypt(pass, "qawsedrftgyhujikolp");
+                    console.log(enc)
+                    var pass = enc.toString();
                     user.set({
                         name:name,
                         pass:pass
