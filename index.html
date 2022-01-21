@@ -14,8 +14,27 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js" integrity="sha512-nOQuvD9nKirvxDdvQ9OMqe2dgapbPB7vYAMrzJihw5m+aNcf0dX53m6YxM4LgA9u8e9eg9QX+/+mPu8kCNpV2A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <title>あやしげNEO</title>
     <style>
-        
+                .chat{
+            border-radius: 2px 15px 15px 15px;
+            background-color:whitesmoke;
+            border-style: solid;
+            border-color:lightgrey;
+            padding: 10px;
+            display: inline-block;
+            white-space:pre-line;
+            box-shadow: 5px 10px 20px rgba(0,0,0,0.25);
+        }
+        .announce{
+            display: inline-block;
+            font-size:small;
+            background-color:darkgray;
+            color:whitesmoke;
+            border-radius: 10px;
+            padding:3px;
+            box-shadow: 5px 10px 20px rgba(0,0,0,0.25);
+        }
     </style>
+    <script src="./common.js"></script>
 </head>
 <body cla>
     <div class="row vh-100 vw-100 m-0 p-0 d-flex">
@@ -174,15 +193,15 @@
 </body>
 <script>
     const firebaseConfig = {
-        apiKey: "AIzaSyAH_Oa-OLx_IYo63uVgFEgh2ewneRKSZpo",
-        authDomain: "ayasigebbs.firebaseapp.com",
-        databaseURL: "https://ayasigebbs-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "ayasigebbs",
-        storageBucket: "ayasigebbs.appspot.com",
-        messagingSenderId: "103380597458",
-        appId: "1:103380597458:web:ee336c6a6355eea6800b0b",
-        measurementId: "G-M6S78Y9CPV"
-    };
+    apiKey: "AIzaSyAH_Oa-OLx_IYo63uVgFEgh2ewneRKSZpo",
+    authDomain: "ayasigebbs.firebaseapp.com",
+    databaseURL: "https://ayasigebbs-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "ayasigebbs",
+    storageBucket: "ayasigebbs.appspot.com",
+    messagingSenderId: "103380597458",
+    appId: "1:103380597458:web:ee336c6a6355eea6800b0b",
+    measurementId: "G-M6S78Y9CPV"
+};
 
     firebase.initializeApp(firebaseConfig);
     var db = firebase.database();
@@ -370,7 +389,11 @@
         var time = data.time;
         nowscore = data.score;
         var num = data.score;
-        thList.append('<li class="list-group-item"><a href="javascript:move('+ ID +')" class="h4">' + title + '</a><span class="badge bg-secondary m-1 justify-content-end " style="text-align: right;"> '+ num +' </span><br>' + name + ' | ' + time +'</li>');
+
+        var childref = db.ref("bbs/conts/"+ ID +"/" + num);
+        childref.on("value", (snapshot)=> {
+            thList.append('<li class="list-group-item"><a href="javascript:move('+ ID +')" class="h4">' + title + '</a><span class="badge bg-secondary m-1 justify-content-end " style="text-align: right;"> '+ num +' </span><br>' + name + ' | ' + time +"<div class='card bg-light p-2'>"+ commit(snapshot,"t",ID) +'</div></li>');
+        });
     });
 </script>
 </html>
