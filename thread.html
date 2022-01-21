@@ -38,6 +38,8 @@
             padding: 10px;
             display: inline-block;
             white-space:pre-line;
+            box-shadow: 8px 8px 16px -8px rgba(0, 0, 0, 0.1);
+
         }
 
 
@@ -64,8 +66,11 @@
             color:whitesmoke;
             border-radius: 10px;
             padding:3px;
+            box-shadow: 8px 8px 16px -8px rgba(0, 0, 0, 0.1);
+
         }
     </style>
+    <script src="./common.js"></script>
 </head>
 <body class=" w-100 vh-100 ">
         <div class="row vh-100 vw-100 m-0 p-0 d-flex">
@@ -159,17 +164,17 @@
       
 
 </body>
-<script>
+<script >
     const firebaseConfig = {
-        apiKey: "AIzaSyAH_Oa-OLx_IYo63uVgFEgh2ewneRKSZpo",
-        authDomain: "ayasigebbs.firebaseapp.com",
-        databaseURL: "https://ayasigebbs-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "ayasigebbs",
-        storageBucket: "ayasigebbs.appspot.com",
-        messagingSenderId: "103380597458",
-        appId: "1:103380597458:web:ee336c6a6355eea6800b0b",
-        measurementId: "G-M6S78Y9CPV"
-    };
+    apiKey: "AIzaSyAH_Oa-OLx_IYo63uVgFEgh2ewneRKSZpo",
+    authDomain: "ayasigebbs.firebaseapp.com",
+    databaseURL: "https://ayasigebbs-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "ayasigebbs",
+    storageBucket: "ayasigebbs.appspot.com",
+    messagingSenderId: "103380597458",
+    appId: "1:103380597458:web:ee336c6a6355eea6800b0b",
+    measurementId: "G-M6S78Y9CPV"
+};
 
     var contIn = $('#contIn');
     var list = $('#list');
@@ -203,7 +208,10 @@
         var ID = snapshot.key;
         var time = data.time;
         var num = data.score;
-            thList.append('<li class="list-group-item flex-column-reverse bd-highlight "><a href="javascript:move('+ ID +')" class="h4 fw-bold ustify-content-start " >' + title + ' </a><span class="badge bg-secondary m-1 justify-content-end " style="text-align: right;"> '+ num +' </span><br>' + name + ' | ' + time + '</li>');
+        var childref = db.ref("bbs/conts/"+ ID +"/" + num);
+        childref.on("value", (snapshot)=> {
+            thList.append('<li class="list-group-item flex-column-reverse bd-highlight "><a href="javascript:move('+ ID +')" class="h4 fw-bold ustify-content-start " >' + title + ' </a><span class="badge bg-secondary m-1 justify-content-end " style="text-align: right;"> '+ num +' </span><br>' + name + ' | ' + time + "<div class='card bg-light p-2'>" + commit(snapshot,"t") + '</div></li>');
+        });
     });
 
     function move(ID){
@@ -376,8 +384,6 @@
     });
 
     function commit(snapshot,t){
-        if(t){
-        }
         var num = snapshot.key;
         var contref = db.ref('bbs/conts/' + thID + '/' + num);
         var re = 'error';
@@ -410,7 +416,7 @@
             }else{
                 var cont = data.cont;
                 var res = resset(cont);
-                cont = cont.replace(/(>>[1-9]\d*|0)/g,"<a class='anc'>" + "$1" + "</a>");
+                cont = cont.replace(/(>>[1-9]\d*)/g,"<a class='anc'>" + "$1" + "</a>");
                 cont = urlre(cont);
                 var num = data.num;
                 var time = data.time;
@@ -461,10 +467,8 @@
 
     function resset(cont){
         var res
-        if(cont.match(/>>[1-9]\d*|0/i)){
-            if(cont.match(/>>[1-9]\d*|0/gi)[0].replace(/>>/, "") != 0){
-                res = cont.match(/>>[1-9]\d*|0/gi)[0].replace(/>>/, "");
-            }
+        if(cont.match(/>>[1-9]\d*/i)){
+            res = cont.match(/>>[1-9]\d*/gi)[0].replace(/>>/, "");
         }
         return res
     }
